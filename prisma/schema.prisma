@@ -24,6 +24,36 @@ enum TicketStatus {
   USED
 }
 
+enum StateUF {
+  AC
+  AL
+  AP
+  AM
+  BA
+  CE
+  DF
+  ES
+  GO
+  MA
+  MT
+  MS
+  MG
+  PA
+  PB
+  PR
+  PE
+  PI
+  RJ
+  RN
+  RS
+  RO
+  RR
+  SC
+  SP
+  SE
+  TO
+}
+
 model User {
   id            String   @id @default(cuid())
   name          String
@@ -62,10 +92,10 @@ model Account {
 model Cinema {
   id       String @id @default(cuid())
   name     String
-  cnpj     String
+  cnpj     String @unique
   address  String
   city     String
-  state    String
+  state    StateUF
   owner_id String
 
   owner  User    @relation(fields: [owner_id], references: [id])
@@ -83,6 +113,8 @@ model Room {
   cinema   Cinema    @relation(fields: [cinema_id], references: [id])
   seats    Seat[]
   sessions Session[]
+
+  @@unique([cinema_id, name])
 }
 
 model Seat {
@@ -93,6 +125,8 @@ model Seat {
 
   room    Room     @relation(fields: [room_id], references: [id])
   tickets Ticket[]
+
+  @@unique([room_id, row_letter, seat_number])
 }
 
 model Movie {
