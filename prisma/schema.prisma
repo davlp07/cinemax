@@ -1,0 +1,136 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Get a free hosted Postgres database in seconds: `npx create-db`
+
+generator client {
+  provider = "prisma-client"
+  output   = "../app/generated/prisma"
+}
+
+datasource db {
+  provider = "mysql"
+}
+
+enum Role {
+  CLIENT
+  CINEMA_ADMIN
+  SUPER_ADMIN
+}
+
+enum TicketStatus {
+  VALID
+  CANCELED
+  USED
+}
+
+model User {
+  id            String   @id @default(cuid())
+  name          String
+  email         String   @unique
+  password_hash String?
+  role          Role     @default(CLIENT)
+  created_at    DateTime @default(now())
+  
+  image             String?
+  emailVerified     DateTime? @map("email_verified")
+
+  accounts Account[]
+  cinemas  Cinema[]
+  tickets  Ticket[]
+}
+
+model Account {
+  id                String  @id @default(cuid())
+  userId            String  @map("user_id")
+  type              String
+  provider          String 
+  providerAccountId String  @map("provider_account_id")
+  refresh_token     String? @db.Text
+  access_token      String? @db.Text
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String? @db.Text
+  session_state     String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+}
+
+model Cinema {
+  id       String @id @default(cuid())
+  name     String
+  cnpj     String
+  address  String
+  city     String
+  state    String
+  owner_id String
+
+  owner  User    @relation(fields: [owner_id], references: [id])
+  rooms  Room[]
+  movies Movie[]
+}
+
+model Room {
+  id            String @id @default(cuid())
+  cinema_id     String
+  name          String
+  rows_count    Int
+  seats_per_row Int
+
+  cinema   Cinema    @relation(fields: [cinema_id], references: [id])
+  seats    Seat[]
+  sessions Session[]
+}
+
+model Seat {
+  id          String @id @default(cuid())
+  room_id     String
+  row_letter  String @db.Char(1)
+  seat_number Int
+
+  room    Room     @relation(fields: [room_id], references: [id])
+  tickets Ticket[]
+}
+
+model Movie {
+  id               String @id @default(cuid())
+  cinema_id        String
+  title            String
+  description      String
+  duration_minutes Int
+  poster_url       String
+
+  cinema   Cinema    @relation(fields: [cinema_id], references: [id])
+  sessions Session[]
+}
+
+model Session {
+  id                 String   @id @default(cuid())
+  movie_id           String
+  room_id            String
+  start_time         DateTime
+  base_price         Decimal
+  refund_limit_hours Int
+  cancellation_fee   Decimal
+
+  movie   Movie    @relation(fields: [movie_id], references: [id])
+  room    Room     @relation(fields: [room_id], references: [id])
+  tickets Ticket[]
+}
+
+model Ticket {
+  id             String       @id @default(cuid())
+  session_id     String
+  user_id        String
+  seat_id        String
+  status         TicketStatus @default(VALID)
+  purchase_price Decimal
+  purchased_at   DateTime     @default(now())
+
+  session Session @relation(fields: [session_id], references: [id])
+  user    User    @relation(fields: [user_id], references: [id])
+  seat    Seat    @relation(fields: [seat_id], references: [id])
+}
