@@ -2,9 +2,10 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
-import { login } from "@/core/actions/login.action";
-import { registerCinema } from "@/core/actions/cinema.action";
+import { ownerLogin, registerCinema } from "@/core/actions/cinema.action";
+import { StateUF } from "@/app/generated/prisma/enums";
 import CinemaForm from "@/components/CinemaForm";
+import toast from 'react-hot-toast';
 
 
 export default function CinemaLogin() {
@@ -12,9 +13,9 @@ export default function CinemaLogin() {
     const [ownerName, setOwnerName] = useState("");
     const [cinemaName, setCinemaName] = useState("");
     const [cnpj, setCnpj] = useState("");
-    const [endereco, setEndereco] = useState("");
-    const [cidade, setCidade] = useState("");
-    const [estado, setEstado] = useState("");
+    const [address, setAddress] = useState("");
+    const [city, setCity] = useState("");
+    const [state, setState] = useState("" as StateUF);
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [showPassword, setShowPassword] = useState(false);
@@ -28,18 +29,18 @@ export default function CinemaLogin() {
 
         try {
             if (loginMode === "login") {
-                // O login é o mesmo, a validação de rota ocorre no backend
-                await login(email, password);
-                alert("Login realizado com sucesso!");
-                router.push("/admin"); // Redireciona para o painel do cinema
+                await ownerLogin(email, password);
+                toast.success("Login realizado com sucesso!");
+                setTimeout(() => {
+                    router.push("/admin");
+                }, 1000);
             } else {
-                // Action específica para registrar cinema no banco com as tabelas de relacionamento
-                await registerCinema(ownerName, cinemaName, cnpj, endereco, cidade, estado, email, password);
-                alert("Cadastro realizado com sucesso! Faça login para acessar o painel.");
-                setLoginMode("login"); // Volta para a aba de login após sucesso
+                await registerCinema(ownerName, cinemaName, cnpj, address, city, state as StateUF, email, password);
+                toast.success("Cadastro realizado com sucesso! Faça login para acessar o painel.");
+                setLoginMode("login");
             }
         } catch (error) {
-            alert((error as Error).message);
+            toast.error((error as Error).message);
             console.error(error);
         } finally {
             setLoading(false);
@@ -58,7 +59,7 @@ export default function CinemaLogin() {
                 
                 <form onSubmit={handleSubmit} className="flex flex-col gap-6 text-left">
                     {loginMode === "register" && (
-                        <CinemaForm props={{ ownerName, setOwnerName, cinemaName, setCinemaName, cnpj, setCnpj, endereco, setEndereco, cidade, setCidade, estado, setEstado }}/>
+                        <CinemaForm props={{ ownerName, setOwnerName, cinemaName, setCinemaName, cnpj, setCnpj, address, setAddress, city, setCity, state, setState }}/>
                     )}
 
                     <div>

@@ -4,6 +4,7 @@ import { useRouter } from "next/navigation";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
 import GoogleLogin from "@/components/GoogleLogin";
 import { login, register } from "@/core/actions/login.action";
+import toast from 'react-hot-toast';
 
 export default function ClienteLogin() {
     const [loginMode, setLoginMode] = useState<"login" | "register">("login");
@@ -21,15 +22,21 @@ export default function ClienteLogin() {
         setLoading(true);
         try {
             if (loginMode === "login") {
-                await login(email, password);
-                alert("Login realizado com sucesso!");
-                router.push("/cliente");
+                const res = await login(email, password);
+                if (res.success) {
+                    toast.success("Login realizado com sucesso!");
+                    setTimeout(() => {
+                        router.push("/cliente");
+                    }, 1000);
+                }
             } else {
-                await register(name, email, password);
-                alert("Cadastro realizado com sucesso!");
+                const res = await register(name, email, password);
+                if (res.success) {
+                    toast.success("Cadastro realizado com sucesso!");
+                }
             }
         } catch (error) {
-            alert((error as Error).message);
+            toast.error((error as Error).message);
             console.error(error);
         } finally {
             setLoading(false);

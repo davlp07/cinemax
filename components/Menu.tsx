@@ -3,9 +3,21 @@
 import { useState } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
+import { useSession, signOut } from 'next-auth/react'; 
+// Usar depois quando mudarmos para icones: import { MdLogout } from "react-icons/md";
+import LogoutModal from './LogoutModal';
+
 
 export default function Menu() {
     const [isOpen, setIsOpen] = useState(false);
+    const [isLogoutModalOpen, setIsLogoutModalOpen] = useState(false);
+
+    const { status } = useSession(); 
+    const isLoggedIn = status === 'authenticated';
+
+    const handleLogout = async () => {
+        await signOut({ callbackUrl: '/' });
+    };
 
     const closeMenu = () => {
       setTimeout(() => {
@@ -14,6 +26,7 @@ export default function Menu() {
     };
 
     return (
+        <>
         <header className="fixed top-0 left-0 z-50 w-full bg-slate-900 text-slate-50 shadow-md">
             <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
                 <div className="flex h-20 items-center justify-between">
@@ -31,9 +44,16 @@ export default function Menu() {
 
                     <nav className="hidden md:flex md:space-x-8 md:items-center">
                         <Link href="/" className="link-menu">Home</Link>
-                        <Link href="/movies" className="link-menu">Filmes</Link>
                         <Link href="/about" className="link-menu">Sobre</Link>
                         <Link href="/contact" className="link-menu">Contato</Link>
+                        {(isLoggedIn) && (
+                            <button 
+                                onClick={() => setIsLogoutModalOpen(true)}
+                                className="link-menu flex items-center cursor-pointer"
+                            >
+                                Sair
+                            </button>
+                        )} 
                     </nav>
 
                     <div className="flex items-center md:hidden">
@@ -65,11 +85,27 @@ export default function Menu() {
                 >
                     <div className="flex flex-col space-y-6 px-4 pb-4 pt-2">
                         <Link href="/" className="link-menu-mobile" onClick={closeMenu}>Home</Link>
-                        <Link href="/movies" className="link-menu-mobile" onClick={closeMenu}>Filmes</Link>
                         <Link href="/about" className="link-menu-mobile" onClick={closeMenu}>Sobre</Link>
                         <Link href="/contact" className="link-menu-mobile" onClick={closeMenu}>Contato</Link>
+                        {(isLoggedIn) && (
+                            <button 
+                                onClick={() => {
+                                    setIsLogoutModalOpen(true);
+                                    closeMenu();
+                                }}
+                                className="link-menu-mobile flex items-center cursor-pointer"
+                            >
+                                Sair
+                            </button>
+                        )}
                     </div>
                 </nav>
         </header>
+        <LogoutModal 
+                isOpen={isLogoutModalOpen} 
+                onClose={() => setIsLogoutModalOpen(false)} 
+                onConfirm={handleLogout} 
+            />
+        </>
     );
 }

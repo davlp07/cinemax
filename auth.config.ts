@@ -8,4 +8,8 @@ export default {
       clientSecret: process.env.AUTH_GOOGLE_SECRET,
     }),
   ],
+  pages: {
+    signIn: '/',
+    signOut: '/',
+  }
 } satisfies NextAuthConfig;

@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import "./globals.css";
 import Providers from "@/components/Providers";
+import { Toaster } from 'react-hot-toast';
 import { Inter } from "next/font/google";
 import  Menu  from "@/components/Menu";
 import type { Viewport } from 'next';
@@ -36,6 +37,7 @@ export default function RootLayout({
           <main className="flex-grow container mx-auto py-20">
             {children}
           </main>
+          <Toaster position="top-center" toastOptions={{ duration: 2000}} />
         </Providers>
       </body>
     </html>
