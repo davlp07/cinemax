@@ -32,7 +32,7 @@ export default function CinemaLogin() {
                 await ownerLogin(email, password);
                 toast.success("Login realizado com sucesso!");
                 setTimeout(() => {
-                    router.push("/admin");
+                    router.push("/cinema");
                 }, 1000);
             } else {
                 await registerCinema(ownerName, cinemaName, cnpj, address, city, state as StateUF, email, password);

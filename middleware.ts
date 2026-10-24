@@ -30,7 +30,7 @@ export default auth((req) => {
         if (pathname === "/cinema/login" || pathname.startsWith("/cliente")) {
             return Response.redirect(new URL("/cinema", req.url));
         }
-    } else if (role === "CLIENTE") {
+    } else if (role === "CLIENT") {
         if (pathname === "/cliente/login" || pathname.startsWith("/cinema")) {
             return Response.redirect(new URL("/cliente", req.url));
         }

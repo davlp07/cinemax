@@ -30,7 +30,7 @@ export async function ownerLogin(email: string, password: string) {
         throw error;
     }
 
-    revalidatePath("/admin");
+    revalidatePath("/cinema");
     return { success: true };
 }
 
