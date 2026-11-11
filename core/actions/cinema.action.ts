@@ -2,7 +2,7 @@
 
 import z from "zod";
 import { StateUF } from "@/app/generated/prisma/enums";
-import { createCinema } from "../services/cinema.service";
+import { createCinema, findCinemasByCity } from "../services/cinema.service";
 import { cnpjValidator } from "@/utils/validators";
 import { revalidatePath } from "next/cache";
 import { signIn } from "@/auth";
@@ -46,12 +46,24 @@ const cinemaSchema = z.object({
     password: z.string().min(6),
 });
 
+export async function getCinemasByCity(city: string) {
+    return findCinemasByCity(city);
+}
+
 export async function registerCinema(ownerName: string, cinemaName: string, cnpj: string, address: string, city: string, state: StateUF, email: string, password: string) {
     try{
         const validatedData = cinemaSchema.parse({ ownerName, cinemaName, cnpj, address, city, state, email, password });
         const cinema = await createCinema(validatedData);
         return { success: true, cinema };
     } catch (error: unknown) {
-        throw new Error((error as Error).message, { cause: error });
+        if (error instanceof z.ZodError) {
+            throw new Error(error.issues.map((issue) => issue.message).join(" · "), { cause: error });
+        }
+
+        if (error instanceof Error) {
+            throw new Error(error.message, { cause: error });
+        }
+
+        throw new Error("Não foi possível cadastrar o cinema.", { cause: error });
     }
 }

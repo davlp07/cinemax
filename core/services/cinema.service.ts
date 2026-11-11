@@ -11,6 +11,13 @@ export async function findCinemaByCNPJ(cnpj: string) {
   return await prisma.cinema.findUnique({ where: { cnpj } });
 }
 
+export async function findCinemasByCity(city: string) {
+  return await prisma.cinema.findMany({
+    where: { city },
+    select: { id: true, name: true, address: true },
+  });
+}
+
 export async function createCinema(cinemaData: {
   ownerName: string;
   cinemaName: string;

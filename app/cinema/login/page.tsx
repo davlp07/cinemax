@@ -40,7 +40,22 @@ export default function CinemaLogin() {
                 setLoginMode("login");
             }
         } catch (error) {
-            toast.error((error as Error).message);
+            const message = error instanceof Error ? error.message : "Ocorreu um erro inesperado.";
+            toast.error(message, {
+                duration: 4000,
+                style: {
+                    background: "#1e293b",
+                    border: "1px solid #ef4444",
+                    borderRadius: "0.75rem",
+                    boxShadow: "0 10px 25px rgb(0 0 0 / 0.25)",
+                    color: "#f1f5f9",
+                    padding: "1rem",
+                },
+                iconTheme: {
+                    primary: "#f87171",
+                    secondary: "#1e293b",
+                },
+            });
             console.error(error);
         } finally {
             setLoading(false);

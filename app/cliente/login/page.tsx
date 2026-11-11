@@ -44,7 +44,7 @@ export default function ClienteLogin() {
     };
 
     return (
-        <div className="flex flex-col items-center justify-center py-12 text-center">
+        <div className="flex flex-col items-center justify-center mt-12 text-center">
             <div className="max-w-4xl md:w-3xl px-4 sm:px-6 lg:px-8 mb-16 bg-slate-800 p-8 rounded-2xl shadow-lg border border-slate-700">
                 <h1 className="text-3xl md:text-4xl font-extrabold tracking-tight text-slate-50 mb-8">
                     {loginMode === "login" ? "Login" : "Cadastro"}
@@ -102,7 +102,7 @@ export default function ClienteLogin() {
                     </button>
                 </form>
 
-                <section className="flex flex-col sm:flex-row items-center justify-center gap-4 mt-6">
+                <section className="flex flex-col sm:flex-row items-center justify-center gap-4 mt-8">
                     <div className="w-full sm:w-1/2">
                         <GoogleLogin />
                     </div>

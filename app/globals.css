@@ -54,3 +54,9 @@ body {
 .delay-400{
   animation-delay: 0.4s;
 }
+
+
+/* Pagina inicial do cliente */
+.user-section {
+  @apply h-full flex flex-col items-center justify-center p-6 rounded-lg shadow-md;
+}
