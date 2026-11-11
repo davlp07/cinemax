@@ -1,34 +1,41 @@
-import { NextResponse } from "next/server";
-import type { NextRequest } from "next/server";
+import NextAuth from "next-auth";
+import authConfig from "./auth.config";
 
-export function middleware(req: NextRequest) {
-    const authSession = req.cookies.get("auth_session")?.value;
+const { auth } = NextAuth(authConfig);
 
-    const nextAuthSession = req.cookies.get("authjs.session-token")?.value || req.cookies.get("next-auth.session-token")?.value;
-
-    const isLoggedIn = !!authSession || !!nextAuthSession;
+export default auth((req) => {
+    const isLoggedIn = !!req.auth;
     const { pathname } = req.nextUrl;
 
-    const isProtectedRoute = pathname.startsWith("/cliente") || pathname.startsWith("/admin");
-    const isClientLoginRoute = pathname.startsWith("/login/cliente");
-    const isAdminLoginRoute = pathname.startsWith("/login/admin");
+    const isPublicRoute = pathname === "/" || pathname === "/cliente/login" || pathname === "/cinema/login";
+    const isProtectedRoute = pathname.startsWith("/cliente") || pathname.startsWith("/cinema");
 
-    // Bloqueia acesso a rotas privadas se deslogado
-    if (isProtectedRoute && !isLoggedIn) {
-        return NextResponse.redirect(new URL("/", req.url));
+    /* ----- Regras para quando usuario NAO estiver LOGADO ----- */
+    if (!isLoggedIn) {
+        if (isProtectedRoute && !isPublicRoute) {
+            return Response.redirect(new URL("/", req.url));
+        }
+        return; 
     }
 
-    // Redireciona usuários já logados que tentarem abrir o /login
-    if (isClientLoginRoute && isLoggedIn) {
-        return NextResponse.redirect(new URL("/cliente", req.url));
+    /* ----- Regras para quando usuario estiver LOGADO ----- */
+    
+    const role = (req.auth?.user as { role: string })?.role || "CLIENTE";
+
+    if (!role && isProtectedRoute && !isPublicRoute) {
+        return Response.redirect(new URL("/", req.url)); 
     }
 
-    if (isAdminLoginRoute && isLoggedIn) {
-        return NextResponse.redirect(new URL("/admin", req.url));
+    if (role === "CINEMA_ADMIN") {
+        if (pathname === "/cinema/login" || pathname.startsWith("/cliente")) {
+            return Response.redirect(new URL("/cinema", req.url));
+        }
+    } else if (role === "CLIENT") {
+        if (pathname === "/cliente/login" || pathname.startsWith("/cinema")) {
+            return Response.redirect(new URL("/cliente", req.url));
+        }
     }
-
-    return NextResponse.next();
-}
+});
 
 export const config = {
     matcher: ["/((?!api|_next/static|_next/image|favicon.ico).*)"],

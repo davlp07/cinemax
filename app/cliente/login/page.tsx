@@ -4,6 +4,7 @@ import { useRouter } from "next/navigation";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
 import GoogleLogin from "@/components/GoogleLogin";
 import { login, register } from "@/core/actions/login.action";
+import toast from 'react-hot-toast';
 
 export default function ClienteLogin() {
     const [loginMode, setLoginMode] = useState<"login" | "register">("login");
@@ -21,15 +22,21 @@ export default function ClienteLogin() {
         setLoading(true);
         try {
             if (loginMode === "login") {
-                await login(email, password);
-                alert("Login realizado com sucesso!");
-                router.push("/cliente");
+                const res = await login(email, password);
+                if (res.success) {
+                    toast.success("Login realizado com sucesso!");
+                    setTimeout(() => {
+                        router.push("/cliente");
+                    }, 1000);
+                }
             } else {
-                await register(name, email, password);
-                alert("Cadastro realizado com sucesso!");
+                const res = await register(name, email, password);
+                if (res.success) {
+                    toast.success("Cadastro realizado com sucesso!");
+                }
             }
         } catch (error) {
-            alert((error as Error).message);
+            toast.error((error as Error).message);
             console.error(error);
         } finally {
             setLoading(false);
@@ -37,7 +44,7 @@ export default function ClienteLogin() {
     };
 
     return (
-        <div className="flex flex-col items-center justify-center py-12 text-center">
+        <div className="flex flex-col items-center justify-center mt-12 text-center">
             <div className="max-w-4xl md:w-3xl px-4 sm:px-6 lg:px-8 mb-16 bg-slate-800 p-8 rounded-2xl shadow-lg border border-slate-700">
                 <h1 className="text-3xl md:text-4xl font-extrabold tracking-tight text-slate-50 mb-8">
                     {loginMode === "login" ? "Login" : "Cadastro"}
@@ -95,7 +102,7 @@ export default function ClienteLogin() {
                     </button>
                 </form>
 
-                <section className="flex flex-col sm:flex-row items-center justify-center gap-4 mt-6">
+                <section className="flex flex-col sm:flex-row items-center justify-center gap-4 mt-8">
                     <div className="w-full sm:w-1/2">
                         <GoogleLogin />
                     </div>

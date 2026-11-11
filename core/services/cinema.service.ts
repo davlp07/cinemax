@@ -11,16 +11,24 @@ export async function findCinemaByCNPJ(cnpj: string) {
   return await prisma.cinema.findUnique({ where: { cnpj } });
 }
 
-export async function createCinema(
-  ownerName: string, 
-  cinemaName: string, 
-  cnpj: string, 
-  address: string, 
-  city: string, 
-  state: StateUF, 
-  email: string, 
-  password: string
-) {
+export async function findCinemasByCity(city: string) {
+  return await prisma.cinema.findMany({
+    where: { city },
+    select: { id: true, name: true, address: true },
+  });
+}
+
+export async function createCinema(cinemaData: {
+  ownerName: string;
+  cinemaName: string;
+  cnpj: string;
+  address: string;
+  city: string;
+  state: StateUF;
+  email: string;
+  password: string;
+}) {
+    const { ownerName, cinemaName, cnpj, address, city, state, email, password } = cinemaData;
     const existingCinema = await findCinemaByCNPJ(cnpj);
     if (existingCinema) {
         throw new Error("Cinema com CNPJ já cadastrado.");

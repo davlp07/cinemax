@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { StateUF } from '@/app/generated/prisma/enums';
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export default function CinemaForm({ props }: { props: any }) {
@@ -14,9 +15,9 @@ export default function CinemaForm({ props }: { props: any }) {
                 const data = await res.json();
                 
                 if (!data.erro) {
-                    props.setEndereco(data.logradouro);
-                    props.setCidade(data.localidade);
-                    props.setEstado(data.uf);
+                    props.setAddress(data.logradouro);
+                    props.setCity(data.localidade);
+                    props.setState(data.uf as StateUF);
                 }
             } catch (error) {
                 console.error("Erro ao buscar o CEP:", error);
@@ -80,11 +81,11 @@ export default function CinemaForm({ props }: { props: any }) {
                 <label className="label-inpt">Endereço</label>
                 <input 
                     type="text" 
-                    name="endereco" 
+                    name="address" 
                     placeholder="Rua, Avenida, etc." 
                     className="input-field"
-                    value={props.endereco} 
-                    onChange={(e) => props.setEndereco(e.target.value)} 
+                    value={props.address} 
+                    onChange={(e) => props.setAddress(e.target.value)} 
                 />
             </div>
 
@@ -92,21 +93,21 @@ export default function CinemaForm({ props }: { props: any }) {
                 <label className="label-inpt">Cidade</label>
                 <input 
                     type="text" 
-                    name="cidade" 
+                    name="city" 
                     placeholder="Nome da cidade" 
                     className="input-field"
-                    value={props.cidade} 
-                    onChange={(e) => props.setCidade(e.target.value)} 
+                    value={props.city} 
+                    onChange={(e) => props.setCity(e.target.value)} 
                 />
             </div>
 
             <div className="md:col-span-4 flex flex-col">
                 <label className="label-inpt">Estado</label>
                 <select 
-                    name="estado" 
+                    name="state" 
                     className="input-field bg-slate-800 text-slate-50"
-                    value={props.estado} 
-                    onChange={(e) => props.setEstado(e.target.value)}
+                    value={props.state} 
+                    onChange={(e) => props.setState(e.target.value as StateUF)}
                 >
                     <option value="">Selecione...</option>
                     <option value="AC">Acre</option>

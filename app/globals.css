@@ -7,11 +7,11 @@
 
 @layer components {
   .link-menu {
-    @apply px-3 py-2 text-lg font-semibold text-white hover:text-yellow-500 transition-colors duration-200 ease-in-out;
+    @apply inline-flex flex-row items-center justify-center gap-2 whitespace-nowrap px-3 py-2 text-lg font-semibold text-white hover:text-yellow-500 transition-colors duration-200 ease-in-out;
   }
 
   .link-menu-mobile {
-    @apply block rounded-md px-3 py-3 text-base font-medium text-white;
+    @apply flex items-center gap-2 rounded-md px-3 py-3 text-base font-medium text-white;
   }
 
   .input-field {
@@ -27,4 +27,36 @@ body {
   background: var(--background);
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.fade-element {
+  animation: fadeIn 0.5s ease-in-out both;
+}
+
+.delay-100{
+  animation-delay: 0.1s;
+}
+.delay-200{
+  animation-delay: 0.2s;
+}
+.delay-300{
+  animation-delay: 0.3s;
+}
+.delay-400{
+  animation-delay: 0.4s;
+}
+
+
+/* Pagina inicial do cliente */
+.user-section {
+  @apply h-full flex flex-col items-center justify-center p-6 rounded-lg shadow-md;
 }
