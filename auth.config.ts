@@ -21,6 +21,7 @@ export default {
     },
     async session({ session, token }) {
       if (session.user) {
+        if(token.sub) session.user.id = token.sub as string;
         session.user.role = token.role as string;
       }
       return session;

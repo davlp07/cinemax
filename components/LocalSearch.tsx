@@ -60,7 +60,7 @@ export default function LocalSearch({ onCityFound, SearchError }: LocalSearchPro
     };
 
     return (
-        <div className="flex flex-col gap-2 w-full max-w-lg">
+        <div className="fixed top-[19vh] flex flex-col gap-2 w-full max-w-lg">
             <div className="flex gap-2">
                 <input 
                     type="text" 

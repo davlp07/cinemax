@@ -4,7 +4,7 @@ import { useState } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useSession, signOut } from 'next-auth/react'; 
-import LogoutModal from './LogoutModal';
+import LogoutModal from '../LogoutModal';
 
 import { FaCartShopping, FaUser } from "react-icons/fa6";
 import { FaQuestionCircle } from "react-icons/fa";
@@ -12,8 +12,6 @@ import { IoMdHome } from "react-icons/io";
 import { MdLogout } from "react-icons/md";
 import { BsFillTelephoneFill } from "react-icons/bs";
 import { GiTheater, GiFilmProjector } from "react-icons/gi";
-
-
 
 
 export default function Menu() {

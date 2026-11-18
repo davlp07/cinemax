@@ -1,6 +1,7 @@
 "use client";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { useSession } from "next-auth/react";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
 import GoogleLogin from "@/components/GoogleLogin";
 import { login, register } from "@/core/actions/login.action";
@@ -15,6 +16,7 @@ export default function ClienteLogin() {
     const [loading, setLoading] = useState(false);
 
     const router = useRouter();
+    const { update } = useSession();
 
     const handleSubmit = async (e: React.SubmitEvent<HTMLFormElement>) => {
         e.preventDefault();
@@ -24,10 +26,10 @@ export default function ClienteLogin() {
             if (loginMode === "login") {
                 const res = await login(email, password);
                 if (res.success) {
+                    await update();
                     toast.success("Login realizado com sucesso!");
-                    setTimeout(() => {
-                        router.push("/cliente");
-                    }, 1000);
+                    router.push("/cliente");
+                    
                 }
             } else {
                 const res = await register(name, email, password);

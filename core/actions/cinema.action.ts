@@ -2,11 +2,20 @@
 
 import z from "zod";
 import { StateUF } from "@/app/generated/prisma/enums";
-import { createCinema, findCinemasByCity } from "../services/cinema.service";
+import {
+    ACTIVE_CINEMA_COOKIE,
+    createCinema,
+    findCinemaByOwnerId,
+    findCinemasByCity,
+    findCinemasByOwnerId,
+} from "../services/cinema.service";
 import { cnpjValidator } from "@/utils/validators";
 import { revalidatePath } from "next/cache";
-import { signIn } from "@/auth";
+import { auth, signIn } from "@/auth";
 import { AuthError } from "next-auth";
+import { cookies } from "next/headers";
+import { redirect } from "next/navigation";
+import { findUserByEmail } from "../services/login.service";
 
 /* Owner Login */
 const loginSchema = z.object({
@@ -30,8 +39,58 @@ export async function ownerLogin(email: string, password: string) {
         throw error;
     }
 
+    const user = await findUserByEmail(validatedData.email);
+    if (!user) {
+        throw new Error("Não foi possível carregar os dados da conta.");
+    }
+
+    if (user.role === "CINEMA_ADMIN") {
+        const firstCinema = (await findCinemasByOwnerId(user.id))[0];
+        const cookieStore = await cookies();
+
+        if (firstCinema) {
+            cookieStore.set(ACTIVE_CINEMA_COOKIE, firstCinema.id, {
+                httpOnly: true,
+                sameSite: "lax",
+                secure: process.env.NODE_ENV === "production",
+                path: "/",
+            });
+        } else {
+            cookieStore.delete(ACTIVE_CINEMA_COOKIE);
+        }
+    }
+
     revalidatePath("/cinema");
     return { success: true };
+}
+
+export async function selectCinema(formData: FormData) {
+    const session = await auth();
+    const ownerId = session?.user?.id;
+
+    if (!ownerId || session.user.role !== "CINEMA_ADMIN") {
+        throw new Error("É necessário estar autenticado como administrador de cinema.");
+    }
+
+    const cinemaId = formData.get("cinemaId");
+    if (typeof cinemaId !== "string" || !cinemaId) {
+        throw new Error("Cinema inválido.");
+    }
+
+    const cinema = await findCinemaByOwnerId(ownerId, cinemaId);
+    if (!cinema) {
+        throw new Error("Este cinema não pertence à sua conta.");
+    }
+
+    const cookieStore = await cookies();
+    cookieStore.set(ACTIVE_CINEMA_COOKIE, cinema.id, {
+        httpOnly: true,
+        sameSite: "lax",
+        secure: process.env.NODE_ENV === "production",
+        path: "/",
+    });
+
+    redirect("/cinema");
 }
 
 /* Cinema Register */

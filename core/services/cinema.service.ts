@@ -3,8 +3,25 @@ import bcrypt from "bcryptjs";
 import { findUserByEmail } from "./login.service"; 
 import { StateUF } from "@/app/generated/prisma/enums";
 
+export const ACTIVE_CINEMA_COOKIE = "activeCinemaId";
+
 export async function findCinemaById(id: string) {
   return await prisma.cinema.findUnique({ where: { id } });
+}
+
+export async function findCinemaByOwnerId(ownerId: string, cinemaId: string) {
+  return prisma.cinema.findFirst({
+    where: { id: cinemaId, owner_id: ownerId },
+    select: { id: true },
+  });
+}
+
+export async function findCinemasByOwnerId(ownerId: string) {
+  return prisma.cinema.findMany({
+    where: { owner_id: ownerId },
+    orderBy: { id: "asc" },
+    select: { id: true, name: true, address: true, city: true, state: true },
+  });
 }
 
 export async function findCinemaByCNPJ(cnpj: string) {

@@ -1,6 +1,7 @@
 "use client";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { useSession } from "next-auth/react";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
 import { ownerLogin, registerCinema } from "@/core/actions/cinema.action";
 import { StateUF } from "@/app/generated/prisma/enums";
@@ -22,6 +23,7 @@ export default function CinemaLogin() {
     const [loading, setLoading] = useState(false);
 
     const router = useRouter();
+    const { update } = useSession();
 
     const handleSubmit = async (e: React.SubmitEvent<HTMLFormElement>) => {
         e.preventDefault();
@@ -30,10 +32,9 @@ export default function CinemaLogin() {
         try {
             if (loginMode === "login") {
                 await ownerLogin(email, password);
+                await update();
                 toast.success("Login realizado com sucesso!");
-                setTimeout(() => {
-                    router.push("/cinema");
-                }, 1000);
+                router.push("/cinema");
             } else {
                 await registerCinema(ownerName, cinemaName, cnpj, address, city, state as StateUF, email, password);
                 toast.success("Cadastro realizado com sucesso! Faça login para acessar o painel.");

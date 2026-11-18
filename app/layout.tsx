@@ -1,10 +1,9 @@
 import type { Metadata } from "next";
 import "./globals.css";
-import Providers from "@/components/Providers";
-import ScrollWatcher from "@/components/ScrollWatcher";
+import Providers from "@/components/layout/Providers";
+import ScrollWatcher from "@/components/layout/ScrollWatcher";
 import { Toaster } from 'react-hot-toast';
 import { Inter } from "next/font/google";
-import  Menu  from "@/components/Menu";
 import type { Viewport } from 'next';
 
 export const viewport: Viewport = {
@@ -35,7 +34,6 @@ export default function RootLayout({
       <body className="h-full flex flex-col" style={{ fontFamily: inter.style.fontFamily }}>
         <Providers>
           <ScrollWatcher />
-          <Menu />
           <main className="flex-grow container mx-auto pt-20">
             {children}
           </main>
